@@ -25,6 +25,7 @@ float getTemp(){
 		}
 		Serial.println(DHT.temperature, 1);
 		temp = DHT.temperature;
+		delay(2000);
 		return temp;
 	}while(continue == true);
 }
