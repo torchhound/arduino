@@ -3,26 +3,19 @@
 #define HOT 5
 #define FAN 4
 
-#include <Wire.h>
 #include <dht.h>
 
 void setup() {
-	Wire.begin();        //join bus as a master
 	Serial.begin(9600);  //start serial port to computer
 	pinMode(HOT,OUTPUT); //set hot and fan pins as outputs.  Default is low.
 	pinMode(FAN,OUTPUT);
 }
 
 //get raw value from sensor, convert it to temperature and return it as a float
-float getTemp(int address){
-	unsigned short upper, lower, raw;
+float getTemp(){
 	float temp;
-	Wire.requestFrom(address,2);
-	while(Wire.available()){ //read data from sensor as a 12 bit twos complement. since this application will always be at ambient temperature, we dont need to worry about the sign.
-		upper= Wire.read();
-		lower= Wire.read();
-		raw  = (upper << 4 ) ^ (lower >>4); //get rid of trailing 0s
-		temp=(float)raw*.0625;              //each ADC “tick” is .0625 of a degree.
+	while(true){ 
+		temp = DHT.read11(DHT11_PIN);
 		return temp;
 	}
 }
@@ -47,17 +40,17 @@ int tempTask(float target,float temp){
 //this function ramps (heats or cools) to the desired temperature, then waits a certian amount of time while holding that temperature
 void singleCycle(int seconds, float target){
 	float temp;
-	temp=getTemp(0b1001111);
+	temp = getTemp();
 	Serial.print(“BEGIN\n”); //prints this at the beginning of every cycle, useful for debugging
 	Serial.println(temp,DEC);
 	while (!tempTask(target,temp)){ //while temperature is not near the target, keep ramping and checking the temperature.  delay makes each cycle take about 1/8 of a second
-		temp=getTemp(0b1001111);
+		temp = getTemp();
 		Serial.println(temp,DEC);
 		tempTask(target,temp);
 		delay(125);
 	}
 	for(int i=0; i<seconds*8; i++){ //seconds*8 since this loop takes about 1/8 second.  holds at the desired temp for the desired number of seconds
-		temp=getTemp(0b1001111);
+		temp = getTemp();
 		Serial.println(temp,DEC);
 		tempTask(target,temp);
 		delay(125);
@@ -70,19 +63,11 @@ void loop(){
 
 	//these wire commands set the prescision of the sensor to 12 bits
 
-	delay(1000);
-	Wire.beginTransmission(0b1001111);
-	Wire.write(0b00000001);
-	Wire.write(0b01100000);
-	Wire.endTransmission();
-
-	Wire.beginTransmission(0b1001111);
-	Wire.write(0b00000000);
-	Wire.endTransmission();
+	delay(1000); //necessary?
 
 	int time=0;
 
-	delay(1000);
+	delay(1000);//necessary?
 
 	//prints start at the beginning of the cycle
 	Serial.println(“START”);
