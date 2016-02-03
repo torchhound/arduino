@@ -21,7 +21,7 @@ float getTemp(){
 }
 
 //this is the function that decides what the machine will do- heat, cool, or idle.  the #define tol .5 at the top can be changed to an arbitrary tolerance.
-//making the tolerence too small will result in your machine flipping between heating and cooling really fast, making it too big will result in more ringing
+//making the tolerance too small will result in your machine flipping between heating and cooling really fast, making it too big will result in more ringing
 int tempTask(float target,float temp){
 	if(temp<(target-tol)){
 		digitalWrite(FAN,LOW);
@@ -34,10 +34,10 @@ int tempTask(float target,float temp){
 	digitalWrite(FAN,LOW);
 	}
 
-	return temp>(target-tol-tol) && temp<(target+tol+tol); //return 1 if temp is within 2 tol- approaching switchover pt. from ramping to waiting for the timer
+	return temp>(target-tol-tol) && temp<(target+tol+tol); //return 1 if temp is within 2 tol- approaching switch over pt. from ramping to waiting for the timer
 }
 
-//this function ramps (heats or cools) to the desired temperature, then waits a certian amount of time while holding that temperature
+//this function ramps (heats or cools) to the desired temperature, then waits a certain amount of time while holding that temperature
 void singleCycle(int seconds, float target){
 	float temp;
 	temp = getTemp();
@@ -59,9 +59,7 @@ void singleCycle(int seconds, float target){
 
 void loop(){
 	float temp, target;
-	target=25; //arb target temp, just so the thing doesent go crazy it is set to about room temperature
-
-	//these wire commands set the prescision of the sensor to 12 bits
+	target=25; //arb target temp, just so the thing doesn't go crazy it is set to about room temperature
 
 	delay(1000); //necessary?
 
@@ -83,7 +81,7 @@ void loop(){
 		singleCycle(30,71);//anneal
 		singleCycle(30,72);//extend
 	}
-	//Final extension etc. goes here.  Note repeat to get correct time.
+	//Final extension etc goes here.  Note repeat to get correct time.
 	singleCycle(30,72);
 	singleCycle(30,72);
 	singleCycle(30,72);
