@@ -1,3 +1,5 @@
+//code originally from: https://tequals0.wordpress.com/2014/04/05/lightbulb-pcr-build-documentation/
+
 #define CYCLE_REPEATS 30
 #define tol .5
 #define HOT 5
@@ -14,10 +16,17 @@ void setup() {
 //get raw value from sensor, convert it to temperature and return it as a float
 float getTemp(){
 	float temp;
-	while(true){ 
-		temp = DHT.read11(DHT11_PIN);
+	int check = 0;
+	bool continue = true;
+	do{ 
+		check = DHT.read11(DHT11_PIN);
+		if(check == DHTLIB_ERROR_CHECKSUM || DHTLIB_ERROR_TIMEOUT || DHTLIB_ERROR_CONNECT || DHTLIB_ERROR_ACK_L || DHTLIB_ERROR_ACK_H){
+			continue = false;
+		}
+		Serial.println(DHT.temperature, 1);
+		temp = DHT.temperature;
 		return temp;
-	}
+	}while(continue == true);
 }
 
 //this is the function that decides what the machine will do- heat, cool, or idle.  the #define tol .5 at the top can be changed to an arbitrary tolerance.
